@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_app_missing">このヘッドユニットにアプリがありません (%1$s)</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">CarInfo トラッキング</string>
+    <string name="tracker_service">サービス</string>
+    <string name="tracker_running">実行中</string>
+    <string name="tracker_stopped">停止中</string>
+    <string name="tracker_device">デバイス</string>
+    <string name="tracker_fix">最新の位置</string>
+    <string name="tracker_sent">最新の送信</string>
+    <string name="tracker_queue">待機中の位置</string>
+    <string name="tracker_error">エラー</string>
+    <string name="tracker_reg">サーバー登録</string>
+    <string name="tracker_reg_none">未送信</string>
+    <string name="tracker_reg_off">リモートチャネルはオフ</string>
+    <string name="tracker_reg_pending">リクエスト送信済み。オペレーターの承認待ち</string>
+    <string name="tracker_reg_approved">使用が承認されました</string>
+    <string name="tracker_fp">デバイスのフィンガープリント（承認のためオペレーターに伝えてください）</string>
+    <string name="tracker_remote">署名付きリモートコマンド（シェル）を許可</string>
+    <string name="tracker_remote_title">リモートコマンド</string>
+    <string name="tracker_remote_msg">サーバーはこのデバイスでコマンドを実行できます（このアプリの権限で）。ただし、このアプリが信頼するオペレーターが署名したパッケージのみです。有効にしますか？</string>
+    <string name="tracker_enable">有効にする</string>
+    <string name="tracker_cancel">キャンセル</string>
 </resources>

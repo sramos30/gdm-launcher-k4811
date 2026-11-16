@@ -4,4 +4,25 @@
     <string name="screen_app_missing">App not found on this head unit (%1$s)</string>
     <!-- Nome do launcher da suíte na linha "Launcher padrão" das Configurações. -->
     <string name="settings_launcher_ours" translatable="false">K4811</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">CarInfo tracking</string>
+    <string name="tracker_service">Service</string>
+    <string name="tracker_running">running</string>
+    <string name="tracker_stopped">stopped</string>
+    <string name="tracker_device">Device</string>
+    <string name="tracker_fix">Last position</string>
+    <string name="tracker_sent">Last upload</string>
+    <string name="tracker_queue">Queued positions</string>
+    <string name="tracker_error">Error</string>
+    <string name="tracker_reg">Server registration</string>
+    <string name="tracker_reg_none">not sent yet</string>
+    <string name="tracker_reg_off">remote channel off</string>
+    <string name="tracker_reg_pending">request sent, waiting for the operator\'s approval</string>
+    <string name="tracker_reg_approved">APPROVED for use</string>
+    <string name="tracker_fp">Device fingerprint (give it to the operator to approve)</string>
+    <string name="tracker_remote">Allow signed remote commands (shell)</string>
+    <string name="tracker_remote_title">Remote commands</string>
+    <string name="tracker_remote_msg">The server will be able to run commands on this device (with this app\'s permissions), but only packages signed by the operators this app trusts. Enable?</string>
+    <string name="tracker_enable">Enable</string>
+    <string name="tracker_cancel">Cancel</string>
 </resources>

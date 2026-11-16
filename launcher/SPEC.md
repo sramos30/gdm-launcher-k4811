@@ -20,6 +20,8 @@ Tela inicial e gaveta de apps. **Não toca nada**: rádio, MP3, BT, telefone, EQ
 | `HomeActivity` | Activity (singleTask, clearTaskOnLaunch) | `MAIN` + `HOME` + `DEFAULT` + `LAUNCHER` |
 | `AppsActivity` | Activity (exportada) | `com.k4811.launcher.action.APPS` |
 | `overlay/VolumeOverlayService` | Service (exportado, só a prévia em modo dev) | aviso de volume por cima dos apps (SettingService tipo 14); `com.k4811.launcher.VOLUME_PREVIEW` |
+| `tracker/TrackerService` | Service (iniciado pelo `LauncherApp`) | rastreamento: posição → servidor |
+| `tracker/TrackerActivity` | Activity (aparece na gaveta) | estado, impressão digital do aparelho, liga/desliga comandos remotos |
 | `overlay/EdgeMenuService` | Service | menu Voltar \| Vol− Vol+ \| Início ao deslizar de uma borda (`McuKeys`) |
 
 ## Tela inicial
@@ -67,3 +69,16 @@ Começam no `LauncherApp`. Janelas `TYPE_SYSTEM_ALERT` (`SYSTEM_ALERT_WINDOW`, c
 ## Lacunas
 
 - Não substitui o launcher original: os serviços dele (janela de volume, barra lateral, botão flutuante, clima) continuam no `com.android.launcher`.
+
+## Rastreamento (`tracker/`)
+
+Porta do app CarInfo para dentro do launcher. Como o launcher é o app de HOME, o sistema o inicia no boot e o reinicia se morrer, e o firmware da central não o mata ao dormir (o CarInfo isolado era morto no sleep da chave).
+
+- **`TrackerService`**: serviço em primeiro plano, iniciado em `LauncherApp.onCreate`. GPS a cada N s (padrão 5), só enfileira se andou ≥ X m (padrão 10, ignora precisão pior que 50 m), ponto de "estou vivo" a cada Y min parado (padrão 10), fila em disco (`queue.jsonl`, até 20 000 pontos) enviada em lotes para `POST /api/positions` e reenviada quando a rede volta.
+- **`Agent`**: canal de comandos remotos **assinados**, desligado por padrão (checkbox na `TrackerActivity`, com confirmação). A chave do aparelho (EC P-256) é gerada uma vez; a pública viaja uma vez, no pedido de cadastro (`/api/agent/enroll`), e o operador a aprova conferindo a impressão digital mostrada na tela. Depois cada contato (`/api/agent/poll`) é só assinado. Só executa pacote assinado por um operador embutido em `assets/operators/*.pem`, endereçado a este aparelho, dentro da validade (≤ 15 min) e nunca visto antes; a resposta volta assinada pelo aparelho. O shell roda com as permissões do launcher.
+- **`Sig`**: ECDSA P-256 / SHA-256 e Base64 próprios, sem dependência do Android (API 17 não tem `java.util.Base64`).
+- **`TrackerLog`**: registro de eventos só de acrescentar, em dois arquivos que se alternam (`tracker.log`/`tracker.old`, ~40 KB cada).
+- **`TrackerActivity`**: serviço rodando?, aparelho, última posição, último envio, fila, erro, estado do cadastro, impressão digital (texto grande, agrupado de 4 em 4), últimas linhas do log. Strings em `common` (`tracker_*`), nos 8 idiomas. Entra na gaveta por exceção em `AppCatalog` (o launcher esconde o resto de si).
+- **Configuração de build (ambiente, nunca no repositório):** `CARINFO_URL`, `CARINFO_TOKEN`, `CARINFO_DEVICE` viram `BuildConfig.DEFAULT_*`. Sem URL ou token o serviço roda mas não envia (a tela mostra o erro). Preferências próprias em `SharedPreferences "tracker"` (intervalo, distância, heartbeat); não usa o `launcher.json`.
+- **Chaves públicas dos operadores** (`assets/operators/*.pem`) são públicas e podem ir ao repositório. Chaves privadas e o token, não.
+- **Não testado na central** (só compila; ver `AGENTS.md`): comportamento do serviço em primeiro plano com targetSdk 19 no Android 10, partida no boot como HOME e comportamento no sleep da chave.

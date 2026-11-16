@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_app_missing">此主机上未找到应用 (%1$s)</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">CarInfo 追踪</string>
+    <string name="tracker_service">服务</string>
+    <string name="tracker_running">运行中</string>
+    <string name="tracker_stopped">已停止</string>
+    <string name="tracker_device">设备</string>
+    <string name="tracker_fix">最近位置</string>
+    <string name="tracker_sent">最近上传</string>
+    <string name="tracker_queue">排队中的位置</string>
+    <string name="tracker_error">错误</string>
+    <string name="tracker_reg">服务器注册</string>
+    <string name="tracker_reg_none">尚未发送</string>
+    <string name="tracker_reg_off">远程通道已关闭</string>
+    <string name="tracker_reg_pending">请求已发送，等待操作员批准</string>
+    <string name="tracker_reg_approved">已批准使用</string>
+    <string name="tracker_fp">设备指纹（提供给操作员以供批准）</string>
+    <string name="tracker_remote">允许已签名的远程命令（shell）</string>
+    <string name="tracker_remote_title">远程命令</string>
+    <string name="tracker_remote_msg">服务器将能够在此设备上运行命令（使用本应用的权限），但仅限本应用信任的操作员签名的数据包。是否启用？</string>
+    <string name="tracker_enable">启用</string>
+    <string name="tracker_cancel">取消</string>
 </resources>

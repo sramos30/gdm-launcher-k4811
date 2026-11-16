@@ -5,10 +5,11 @@ import com.k4811.common.audio.PlayerHandoff;
 import com.k4811.common.system.NwdSettings;
 import com.k4811.launcher.overlay.EdgeMenuService;
 import com.k4811.launcher.overlay.VolumeOverlayService;
+import com.k4811.launcher.tracker.TrackerService;
 
 /**
  * Aplicação: base da suíte, Bluetooth conectado (o widget pausa a música BT), SettingService, o
- * aviso de volume e o menu da borda de baixo por cima dos apps.
+ * aviso de volume, o menu da borda de baixo por cima dos apps e o rastreamento (tracker/).
  */
 public class LauncherApp extends SuiteApp {
     @Override
@@ -18,5 +19,6 @@ public class LauncherApp extends SuiteApp {
         NwdSettings.init(this);
         VolumeOverlayService.start(this);
         EdgeMenuService.start(this);
+        TrackerService.start(this);
     }
 }

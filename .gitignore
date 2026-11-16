@@ -60,3 +60,6 @@ local/
 
 # ---------------------------------------------------------------- Claude Code
 .claude/settings.local.json
+
+# Chaves PÚBLICAS dos operadores do rastreamento (embutidas no app). Chaves privadas continuam ignoradas.
+!launcher/src/main/assets/operators/*.pem

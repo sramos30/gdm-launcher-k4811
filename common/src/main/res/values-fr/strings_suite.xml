@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_app_missing">Application introuvable sur cet autoradio (%1$s)</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">Suivi CarInfo</string>
+    <string name="tracker_service">Service</string>
+    <string name="tracker_running">en cours</string>
+    <string name="tracker_stopped">arrêté</string>
+    <string name="tracker_device">Appareil</string>
+    <string name="tracker_fix">Dernière position</string>
+    <string name="tracker_sent">Dernier envoi</string>
+    <string name="tracker_queue">Positions en attente</string>
+    <string name="tracker_error">Erreur</string>
+    <string name="tracker_reg">Enregistrement sur le serveur</string>
+    <string name="tracker_reg_none">pas encore envoyé</string>
+    <string name="tracker_reg_off">canal distant désactivé</string>
+    <string name="tracker_reg_pending">demande envoyée, en attente de l\'approbation de l\'opérateur</string>
+    <string name="tracker_reg_approved">APPROUVÉ pour utilisation</string>
+    <string name="tracker_fp">Empreinte de l\'appareil (à communiquer à l\'opérateur pour approbation)</string>
+    <string name="tracker_remote">Autoriser les commandes distantes signées (shell)</string>
+    <string name="tracker_remote_title">Commandes distantes</string>
+    <string name="tracker_remote_msg">Le serveur pourra exécuter des commandes sur cet appareil (avec les autorisations de cette application), mais uniquement des paquets signés par les opérateurs auxquels elle fait confiance. Activer ?</string>
+    <string name="tracker_enable">Activer</string>
+    <string name="tracker_cancel">Annuler</string>
 </resources>

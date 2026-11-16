@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_app_missing">App no encontrada en este equipo (%1$s)</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">Seguimiento CarInfo</string>
+    <string name="tracker_service">Servicio</string>
+    <string name="tracker_running">en ejecución</string>
+    <string name="tracker_stopped">detenido</string>
+    <string name="tracker_device">Dispositivo</string>
+    <string name="tracker_fix">Última posición</string>
+    <string name="tracker_sent">Último envío</string>
+    <string name="tracker_queue">Posiciones en cola</string>
+    <string name="tracker_error">Error</string>
+    <string name="tracker_reg">Registro en el servidor</string>
+    <string name="tracker_reg_none">aún no enviado</string>
+    <string name="tracker_reg_off">canal remoto apagado</string>
+    <string name="tracker_reg_pending">solicitud enviada, esperando la aprobación del operador</string>
+    <string name="tracker_reg_approved">APROBADO para su uso</string>
+    <string name="tracker_fp">Huella digital del dispositivo (dásela al operador para aprobar)</string>
+    <string name="tracker_remote">Permitir comandos remotos firmados (shell)</string>
+    <string name="tracker_remote_title">Comandos remotos</string>
+    <string name="tracker_remote_msg">El servidor podrá ejecutar comandos en este dispositivo (con los permisos de esta app), pero solo paquetes firmados por los operadores en los que esta app confía. ¿Activar?</string>
+    <string name="tracker_enable">Activar</string>
+    <string name="tracker_cancel">Cancelar</string>
 </resources>

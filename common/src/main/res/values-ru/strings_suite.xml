@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_app_missing">Приложение не найдено на этой магнитоле (%1$s)</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">Трекинг CarInfo</string>
+    <string name="tracker_service">Служба</string>
+    <string name="tracker_running">работает</string>
+    <string name="tracker_stopped">остановлена</string>
+    <string name="tracker_device">Устройство</string>
+    <string name="tracker_fix">Последняя позиция</string>
+    <string name="tracker_sent">Последняя отправка</string>
+    <string name="tracker_queue">Позиций в очереди</string>
+    <string name="tracker_error">Ошибка</string>
+    <string name="tracker_reg">Регистрация на сервере</string>
+    <string name="tracker_reg_none">ещё не отправлена</string>
+    <string name="tracker_reg_off">удалённый канал выключен</string>
+    <string name="tracker_reg_pending">запрос отправлен, ожидается одобрение оператора</string>
+    <string name="tracker_reg_approved">ОДОБРЕНО для использования</string>
+    <string name="tracker_fp">Отпечаток устройства (сообщите оператору для одобрения)</string>
+    <string name="tracker_remote">Разрешить подписанные удалённые команды (shell)</string>
+    <string name="tracker_remote_title">Удалённые команды</string>
+    <string name="tracker_remote_msg">Сервер сможет выполнять команды на этом устройстве (с правами этого приложения), но только пакеты, подписанные доверенными операторами. Включить?</string>
+    <string name="tracker_enable">Включить</string>
+    <string name="tracker_cancel">Отмена</string>
 </resources>

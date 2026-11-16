@@ -68,7 +68,8 @@ public final class AppCatalog {
             String pkg = info.activityInfo.packageName;
             String cls = info.activityInfo.name;
             if (pkg == null || cls == null) continue;
-            if (pkg.equals(ours) || keyboards.contains(pkg)) continue;
+            // O launcher se esconde da própria gaveta, menos a tela do rastreamento (estado e impressão digital).
+            if ((pkg.equals(ours) && !cls.endsWith(".tracker.TrackerActivity")) || keyboards.contains(pkg)) continue;
             if (!hardwareAllows(pkg, cls, features)) continue;
             CharSequence title = info.loadLabel(pm);
             String label = title == null ? pkg : title.toString().trim();

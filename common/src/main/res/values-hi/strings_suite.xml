@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_app_missing">इस हेड यूनिट पर ऐप नहीं मिला (%1$s)</string>
+    <!-- Rastreamento (CarInfo no launcher): tela de estado e canal de comandos remotos. -->
+    <string name="tracker_title">CarInfo ट्रैकिंग</string>
+    <string name="tracker_service">सेवा</string>
+    <string name="tracker_running">चल रही है</string>
+    <string name="tracker_stopped">रुकी हुई</string>
+    <string name="tracker_device">डिवाइस</string>
+    <string name="tracker_fix">अंतिम स्थान</string>
+    <string name="tracker_sent">अंतिम अपलोड</string>
+    <string name="tracker_queue">कतार में स्थान</string>
+    <string name="tracker_error">त्रुटि</string>
+    <string name="tracker_reg">सर्वर पंजीकरण</string>
+    <string name="tracker_reg_none">अभी भेजा नहीं गया</string>
+    <string name="tracker_reg_off">रिमोट चैनल बंद</string>
+    <string name="tracker_reg_pending">अनुरोध भेजा गया, ऑपरेटर की मंज़ूरी की प्रतीक्षा</string>
+    <string name="tracker_reg_approved">उपयोग के लिए स्वीकृत</string>
+    <string name="tracker_fp">डिवाइस फ़िंगरप्रिंट (मंज़ूरी के लिए ऑपरेटर को दें)</string>
+    <string name="tracker_remote">हस्ताक्षरित रिमोट कमांड (शेल) की अनुमति दें</string>
+    <string name="tracker_remote_title">रिमोट कमांड</string>
+    <string name="tracker_remote_msg">सर्वर इस डिवाइस पर कमांड चला सकेगा (इस ऐप की अनुमतियों के साथ), लेकिन केवल उन ऑपरेटरों द्वारा हस्ताक्षरित पैकेज जिन पर यह ऐप भरोसा करता है। चालू करें?</string>
+    <string name="tracker_enable">चालू करें</string>
+    <string name="tracker_cancel">रद्द करें</string>
 </resources>
