@@ -22,4 +22,8 @@
     <string name="tracker_remote_msg">Сервер сможет выполнять команды на этом устройстве (с правами этого приложения), но только пакеты, подписанные доверенными операторами. Включить?</string>
     <string name="tracker_enable">Включить</string>
     <string name="tracker_cancel">Отмена</string>
+    <string name="tracker_update">Скачать обновление приложения</string>
+    <string name="tracker_update_downloading">Загрузка…</string>
+    <string name="tracker_send_logs">Отправить журналы на сервер</string>
+    <string name="tracker_logs_sent">Журналы отправлены</string>
 </resources>

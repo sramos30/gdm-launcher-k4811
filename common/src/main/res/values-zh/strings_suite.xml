@@ -22,4 +22,8 @@
     <string name="tracker_remote_msg">服务器将能够在此设备上运行命令（使用本应用的权限），但仅限本应用信任的操作员签名的数据包。是否启用？</string>
     <string name="tracker_enable">启用</string>
     <string name="tracker_cancel">取消</string>
+    <string name="tracker_update">下载应用更新</string>
+    <string name="tracker_update_downloading">正在下载…</string>
+    <string name="tracker_send_logs">将日志发送到服务器</string>
+    <string name="tracker_logs_sent">日志已发送</string>
 </resources>

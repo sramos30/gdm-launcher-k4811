@@ -33,7 +33,8 @@ Tela inicial e gaveta de apps. **Não toca nada**: rádio, MP3, BT, telefone, EQ
 - Recria a tela no `onResume` se idioma, tema ou fonte mudaram (`lookKey`).
 - Se o `launcher.json` não existia ao abrir (na partida o sdcard monta depois do launcher), espera o arquivo aparecer (`ACTION_MEDIA_MOUNTED` e conferência a cada 2 s por 2 min) e recria a tela; a pergunta de launcher padrão espera isso.
 - Pergunta para virar o launcher padrão (`persist.nwd.launcher.default`) se `ask_default_launcher`.
-- Segurar a área vazia abre as Configurações do Android (saída de emergência).
+- Segurar a área vazia abre as Configurações do Android (saída de emergência). A engrenagem abre o app de configurações da suíte (`car-setting`) e, se ele não estiver instalado, as Configurações do Android.
+- **Dock na tela inicial**: o primeiro botão (Início, que não faz nada ali) é o **Vídeo** (`DockView.refresh`, só quando o app é o launcher e o app de vídeo existe). Nos outros apps o Início continua.
 
 ## "Tocando agora" (`home/HomeSession`)
 
@@ -81,4 +82,7 @@ Porta do app CarInfo para dentro do launcher. Como o launcher é o app de HOME, 
 - **`TrackerActivity`**: serviço rodando?, aparelho, última posição, último envio, fila, erro, estado do cadastro, impressão digital (texto grande, agrupado de 4 em 4), últimas linhas do log. Strings em `common` (`tracker_*`), nos 8 idiomas. Entra na gaveta por exceção em `AppCatalog` (o launcher esconde o resto de si).
 - **Configuração de build (ambiente, nunca no repositório):** `CARINFO_URL`, `CARINFO_TOKEN`, `CARINFO_DEVICE` viram `BuildConfig.DEFAULT_*`. Sem URL ou token o serviço roda mas não envia (a tela mostra o erro). Preferências próprias em `SharedPreferences "tracker"` (intervalo, distância, heartbeat); não usa o `launcher.json`.
 - **Chaves públicas dos operadores** (`assets/operators/*.pem`) são públicas e podem ir ao repositório. Chaves privadas e o token, não.
-- **Não testado na central** (só compila; ver `AGENTS.md`): comportamento do serviço em primeiro plano com targetSdk 19 no Android 10, partida no boot como HOME e comportamento no sleep da chave.
+- **Botões da `TrackerActivity`**: *Baixar atualização do app* (baixa `/dl/launcher?token=…` para `getExternalFilesDir` e pede a instalação com `ACTION_INSTALL_PACKAGE`; sem instalador padrão abre um seletor; o Android pede a confirmação, nada é instalado em silêncio) e *Enviar logs ao servidor* (`POST /api/diag`: estado, eventos e logcat do app).
+- **Assinatura**: o release sai com a chave de debug (sem `keystore.properties`). Ela precisa ser **a mesma em todos os builds**, senão o Android recusa a atualização por cima (erro −7, `INSTALL_FAILED_UPDATE_INCOMPATIBLE`). No ambiente de build do servidor ela fica em `android/keystore/launcher-debug-home/` (montada como `~/.android` do container; fora do git, manter privada).
+- **Reinstalação**: ao desinstalar, a chave do aparelho se perde. O servidor ainda guarda a antiga aprovada para o mesmo id e responde 401 aos contatos novos: rodar `carctl.py revoke <id>` antes de o aparelho pedir cadastro de novo e aprovar a impressão nova.
+- **Testado na central (2026-11-16)**: serviço em primeiro plano com targetSdk 19 no Android 10 roda, partida no boot funciona, posições e cadastro chegam ao servidor. **Não testado**: sobrevivência ao sleep da chave e a atualização pelo botão (a 2.0.13 abria o APK no Termux; corrigido na 2.0.14, ainda a confirmar).

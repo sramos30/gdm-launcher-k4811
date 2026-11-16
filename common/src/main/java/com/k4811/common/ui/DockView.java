@@ -163,8 +163,13 @@ public class DockView extends LinearLayout {
         Set<Item> toggles = LauncherConfig.dockToggles(c);
         List<Item> shown = new ArrayList<>();
         StringBuilder key = new StringBuilder();
+        // Na tela inicial do launcher o Início não faz nada (já se está nele): o primeiro botão vira Vídeo.
+        // Dentro dos outros apps o Início continua lá, como saída.
+        boolean videoFirst = Apps.LAUNCHER.equals(c.getPackageName()) && Item.VIDEO.isAvailable(c);
         for (Item item : Item.values()) {
+            if (videoFirst && item == Item.VIDEO) continue;
             if (item.toggleable && !(toggles.contains(item) && item.isAvailable(c))) continue;
+            if (videoFirst && item == Item.HOME) item = Item.VIDEO;
             shown.add(item);
             key.append(item.id).append(',');
         }

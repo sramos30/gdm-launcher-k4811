@@ -11,8 +11,8 @@ android {
         // applicationId: definido na tabela de packages do build.gradle.kts da raiz
         minSdk = 17     // Android 4.2, igual ao apps originais da NWD
         targetSdk = 19  // Android 4.4, igual ao apps originais da NWD
-        versionCode = 20270008  // maior que o de todos os originais (o com.nwd.audioset está em 20260915)
-        versionName = "2.0.8"
+        versionCode = 20270014  // maior que o de todos os originais (o com.nwd.audioset está em 20260915)
+        versionName = "2.0.14"
 
         // Rastreamento (CarInfo): servidor, token e nome do aparelho vêm do AMBIENTE na hora do build, nunca do repositório.
         //   CARINFO_URL     ex.: https://servidor.exemplo   (vazio = rastreamento parado)

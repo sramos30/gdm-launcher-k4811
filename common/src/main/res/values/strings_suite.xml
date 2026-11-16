@@ -25,4 +25,8 @@
     <string name="tracker_remote_msg">The server will be able to run commands on this device (with this app\'s permissions), but only packages signed by the operators this app trusts. Enable?</string>
     <string name="tracker_enable">Enable</string>
     <string name="tracker_cancel">Cancel</string>
+    <string name="tracker_update">Download app update</string>
+    <string name="tracker_update_downloading">Downloading…</string>
+    <string name="tracker_send_logs">Send logs to the server</string>
+    <string name="tracker_logs_sent">Logs sent</string>
 </resources>

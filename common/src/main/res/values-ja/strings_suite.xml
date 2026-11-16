@@ -22,4 +22,8 @@
     <string name="tracker_remote_msg">サーバーはこのデバイスでコマンドを実行できます（このアプリの権限で）。ただし、このアプリが信頼するオペレーターが署名したパッケージのみです。有効にしますか？</string>
     <string name="tracker_enable">有効にする</string>
     <string name="tracker_cancel">キャンセル</string>
+    <string name="tracker_update">アプリの更新をダウンロード</string>
+    <string name="tracker_update_downloading">ダウンロード中…</string>
+    <string name="tracker_send_logs">ログをサーバーに送信</string>
+    <string name="tracker_logs_sent">ログを送信しました</string>
 </resources>

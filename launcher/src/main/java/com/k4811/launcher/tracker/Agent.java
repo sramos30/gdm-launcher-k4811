@@ -122,6 +122,7 @@ final class Agent implements Runnable {
         Map<String, PublicKey> ops = operators(ctx);
         TrackerLog.log(ctx, "remoto: canal ATIVO (" + ops.size() + " operadores confiáveis, impressão do aparelho " + deviceFp(ctx) + ")");
         int fails = 0;
+        String lastErr = null;
         while (true) {
             TrackerConfig cfg = new TrackerConfig(ctx);
             if (!cfg.remote()) {
@@ -147,7 +148,11 @@ final class Agent implements Runnable {
                     if (r != null && r.has("id")) handle(cfg, ops, r);
                 }
             } catch (Throwable e) {
-                if (fails++ == 0) TrackerLog.log(ctx, "remoto: falha no canal: " + e);
+                fails++;
+                if (!String.valueOf(e).equals(lastErr)) {
+                    lastErr = String.valueOf(e);
+                    TrackerLog.log(ctx, "remoto: falha no canal: " + e);
+                }
                 pause(Math.min(60000, 5000L * (1 << Math.min(fails, 4))));
             }
         }

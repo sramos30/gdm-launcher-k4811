@@ -22,4 +22,8 @@
     <string name="tracker_remote_msg">Le serveur pourra exécuter des commandes sur cet appareil (avec les autorisations de cette application), mais uniquement des paquets signés par les opérateurs auxquels elle fait confiance. Activer ?</string>
     <string name="tracker_enable">Activer</string>
     <string name="tracker_cancel">Annuler</string>
+    <string name="tracker_update">Télécharger la mise à jour de l\'app</string>
+    <string name="tracker_update_downloading">Téléchargement…</string>
+    <string name="tracker_send_logs">Envoyer les journaux au serveur</string>
+    <string name="tracker_logs_sent">Journaux envoyés</string>
 </resources>

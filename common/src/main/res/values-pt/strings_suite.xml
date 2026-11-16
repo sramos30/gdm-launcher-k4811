@@ -22,4 +22,8 @@
     <string name="tracker_remote_msg">O servidor poderá executar comandos neste aparelho (com as permissões deste app), mas só pacotes assinados pelos operadores em que este app confia. Ligar?</string>
     <string name="tracker_enable">Ligar</string>
     <string name="tracker_cancel">Cancelar</string>
+    <string name="tracker_update">Baixar atualização do app</string>
+    <string name="tracker_update_downloading">Baixando…</string>
+    <string name="tracker_send_logs">Enviar logs ao servidor</string>
+    <string name="tracker_logs_sent">Logs enviados</string>
 </resources>

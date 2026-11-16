@@ -22,4 +22,8 @@
     <string name="tracker_remote_msg">सर्वर इस डिवाइस पर कमांड चला सकेगा (इस ऐप की अनुमतियों के साथ), लेकिन केवल उन ऑपरेटरों द्वारा हस्ताक्षरित पैकेज जिन पर यह ऐप भरोसा करता है। चालू करें?</string>
     <string name="tracker_enable">चालू करें</string>
     <string name="tracker_cancel">रद्द करें</string>
+    <string name="tracker_update">ऐप अपडेट डाउनलोड करें</string>
+    <string name="tracker_update_downloading">डाउनलोड हो रहा है…</string>
+    <string name="tracker_send_logs">लॉग सर्वर को भेजें</string>
+    <string name="tracker_logs_sent">लॉग भेज दिए गए</string>
 </resources>

@@ -356,7 +356,11 @@ public class HomeActivity extends Activity {
         });
 
         icon(R.id.settings_button, IconView.Icon.SETTINGS, IconView.Style.NONE)
-            .setOnClickListener(v -> openApp(Apps.SETTINGS));
+            .setOnClickListener(v -> {
+                // Sem o app de configurações da suíte (car-setting), abre as Configurações do Android.
+                if (getPackageManager().getLaunchIntentForPackage(Apps.SETTINGS) == null) openAndroidSettings();
+                else openApp(Apps.SETTINGS);
+            });
         icon(R.id.screen_off_button, IconView.Icon.SCREEN_OFF, IconView.Style.NONE)
             .setOnClickListener(v -> setScreenOn(false));
         screenOffOverlay = findViewById(R.id.screen_off_overlay);
