@@ -2,7 +2,10 @@ package com.k4811.launcher.tracker;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.Intent;
 import android.net.Uri;
 import android.widget.Button;
@@ -165,8 +168,16 @@ public final class TrackerActivity extends Activity {
                             Toast.makeText(TrackerActivity.this, error, Toast.LENGTH_LONG).show();
                             return;
                         }
+                        if (android.os.Build.VERSION.SDK_INT >= 21) {
+                            try {
+                                installWithSession(out);
+                                return;
+                            } catch (Exception e) {
+                                TrackerLog.log(TrackerActivity.this, "atualização: sessão falhou (" + e + "), tentando intent");
+                            }
+                        }
                         try {
-                            // INSTALL_PACKAGE só casa com instaladores (o VIEW genérico caía no Termux).
+                            // Plano B. Nesta central nada responde a INSTALL_PACKAGE/VIEW além do Termux.
                             Intent i = new Intent(Intent.ACTION_INSTALL_PACKAGE);
                             i.setDataAndType(Uri.fromFile(out), "application/vnd.android.package-archive");
                             i.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
@@ -188,6 +199,59 @@ public final class TrackerActivity extends Activity {
                 });
             }
         }).start();
+    }
+
+    /**
+     * Instala pela API PackageInstaller. Esta central não tem app que responda a INSTALL_PACKAGE/VIEW
+     * (só o Termux), mas o instalador do sistema atende CONFIRM_INSTALL, que é o que a sessão dispara.
+     */
+    private void installWithSession(java.io.File apk) throws java.io.IOException {
+        final String action = getPackageName() + ".INSTALL_RESULT";
+        final android.content.pm.PackageInstaller pi = getPackageManager().getPackageInstaller();
+        android.content.pm.PackageInstaller.SessionParams sp = new android.content.pm.PackageInstaller.SessionParams(
+            android.content.pm.PackageInstaller.SessionParams.MODE_FULL_INSTALL);
+        int id = pi.createSession(sp);
+        android.content.pm.PackageInstaller.Session s = pi.openSession(id);
+        try {
+            java.io.InputStream in = new java.io.FileInputStream(apk);
+            java.io.OutputStream os = s.openWrite("launcher.apk", 0, apk.length());
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) > 0) os.write(buf, 0, n);
+            s.fsync(os);
+            os.close();
+            in.close();
+            final BroadcastReceiver[] rx = new BroadcastReceiver[1];
+            rx[0] = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context ctx, Intent r) {
+                    int st = r.getIntExtra(android.content.pm.PackageInstaller.EXTRA_STATUS, -999);
+                    String msg = r.getStringExtra(android.content.pm.PackageInstaller.EXTRA_STATUS_MESSAGE);
+                    if (st == android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION) {
+                        Intent c = (Intent) r.getParcelableExtra(Intent.EXTRA_INTENT);
+                        if (c != null) {
+                            c.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            try { startActivity(c); } catch (Exception e) {
+                                TrackerLog.log(TrackerActivity.this, "atualização: confirmação não abriu: " + e);
+                            }
+                        }
+                        return;
+                    }
+                    TrackerLog.log(TrackerActivity.this, "atualização: instalador respondeu " + st + " " + msg);
+                    if (st != android.content.pm.PackageInstaller.STATUS_SUCCESS) {
+                        Toast.makeText(TrackerActivity.this, "Instalação: " + msg, Toast.LENGTH_LONG).show();
+                    }
+                    try { unregisterReceiver(rx[0]); } catch (Exception ignore) { }
+                }
+            };
+            registerReceiver(rx[0], new IntentFilter(action));
+            android.app.PendingIntent pend = android.app.PendingIntent.getBroadcast(this, id,
+                new Intent(action).setPackage(getPackageName()), android.app.PendingIntent.FLAG_UPDATE_CURRENT);
+            TrackerLog.log(this, "atualização: enviando ao instalador (sessão " + id + ")");
+            s.commit(pend.getIntentSender());
+        } finally {
+            s.close();
+        }
     }
 
     private void sendLogs(final Button btn) {
