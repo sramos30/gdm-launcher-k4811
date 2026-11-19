@@ -44,7 +44,7 @@ public final class TrackerActivity extends Activity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(pad, pad, pad, pad);
 
-        TextView title = text(getString(R.string.tracker_title), 26, 0xFFFFFFFF);
+        TextView title = text(getString(R.string.tracker_title) + "  v" + BuildConfig.VERSION_NAME, 26, 0xFFFFFFFF);
         root.addView(title);
 
         status = text("", 18, 0xFFE0E0E0);
