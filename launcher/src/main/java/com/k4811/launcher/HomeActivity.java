@@ -207,7 +207,7 @@ public class HomeActivity extends Activity {
     private final Runnable tempTick = new Runnable() {
         @Override
         public void run() {
-            int t = readTemp();
+            int t = Thermal.readC();
             if (t != tempC) {
                 tempC = t;
                 renderFan();
@@ -215,24 +215,6 @@ public class HomeActivity extends Activity {
             handler.postDelayed(this, TEMP_PERIOD_MS);
         }
     };
-
-    /** Highest /sys/class/thermal/thermal_zone*\/temp; values above 1000 are milli-degrees. */
-    private static int readTemp() {
-        int best = -1;
-        for (int i = 0; i < 12; i++) {
-            java.io.File f = new java.io.File("/sys/class/thermal/thermal_zone" + i + "/temp");
-            if (!f.canRead()) continue;
-            try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f))) {
-                String line = r.readLine();
-                if (line == null) continue;
-                long v = Long.parseLong(line.trim());
-                if (v > 1000) v /= 1000;
-                if (v > 0 && v < 150 && v > best) best = (int) v;
-            } catch (Exception ignored) {
-            }
-        }
-        return best;
-    }
 
     private final Runnable voltageTick = new Runnable() {
         @Override
@@ -398,7 +380,11 @@ public class HomeActivity extends Activity {
         icon(R.id.screen_off_button, IconView.Icon.SCREEN_OFF, IconView.Style.NONE)
             .setOnClickListener(v -> setScreenOn(false));
         screenOffOverlay = findViewById(R.id.screen_off_overlay);
-        screenOffOverlay.setOnClickListener(v -> setScreenOn(true));
+        screenOffOverlay.setOnClickListener(v -> {
+            Thermal.lockUntil = android.os.SystemClock.elapsedRealtime() + 3 * 60000L;   // acordou: não apagar de novo por 3 min
+            setScreenOn(true);
+        });
+        if (getIntent().getBooleanExtra(Thermal.EXTRA_OVERHEAT, false)) handler.post(() -> setScreenOn(false));
 
         clockTime = text(R.id.clock_time);
         clockDate = text(R.id.clock_date);
@@ -486,6 +472,13 @@ public class HomeActivity extends Activity {
         renderVolume();
         renderFan();
         renderBt();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (intent.getBooleanExtra(Thermal.EXTRA_OVERHEAT, false) && screenOffOverlay != null) setScreenOn(false);
     }
 
     @Override
@@ -912,8 +905,16 @@ public class HomeActivity extends Activity {
     private void renderFan() {
         if (fanText == null) return;
         fanDot.setActivated(fanOn);
+        String deg = tempC > 0 ? tempC + "\u00b0C" : "--";
+        if (!Thermal.fanPresent(this)) {
+            // Sem ventoinha ON/OFF não faz sentido: só a temperatura.
+            fanDot.setVisibility(View.GONE);
+            fanText.setText(deg);
+            fanText.setTextColor(tempC >= Thermal.OVERHEAT_C ? Ui.TEXT : Ui.TEXT_MUTED);
+            return;
+        }
         String st = getString(fanOn ? R.string.home_fan_on : R.string.home_fan_off);
-        fanText.setText(tempC > 0 ? st + " \u00b7 " + tempC + "\u00b0C" : st);
+        fanText.setText(tempC > 0 ? st + " \u00b7 " + deg : st);
         fanText.setTextColor(fanOn ? Ui.TEXT : Ui.TEXT_MUTED);
     }
 

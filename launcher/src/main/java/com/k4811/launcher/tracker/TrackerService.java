@@ -219,6 +219,7 @@ public final class TrackerService extends Service implements LocationListener {
             } catch (Throwable t) {
                 cfg.setStatus("err", "tick: " + t);
             }
+            com.k4811.launcher.Thermal.check(TrackerService.this);
             h.postDelayed(this, cfg.intervalSec() * 1000L);
         }
     };

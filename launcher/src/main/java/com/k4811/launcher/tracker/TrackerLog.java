@@ -16,14 +16,14 @@ import java.util.Locale;
  * Registro de eventos do rastreamento. Só acrescenta ao fim (não perde nada se o processo morrer no meio);
  * ao passar de ~40 KB o arquivo atual vira {@code tracker.old} (o rename substitui o antigo de uma vez).
  */
-final class TrackerLog {
+public final class TrackerLog {
     private static final Object LOCK = new Object();
     private static final long MAX = 40 * 1024;
 
     private TrackerLog() {
     }
 
-    static void log(Context c, String msg) {
+    public static void log(Context c, String msg) {
         synchronized (LOCK) {
             try {
                 File dir = c.getApplicationContext().getFilesDir();
