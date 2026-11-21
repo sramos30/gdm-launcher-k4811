@@ -200,6 +200,40 @@ public class HomeActivity extends Activity {
     private static final String EXTRA_VOLTAGE = "extra_voltage_value";
     private static final long VOLTAGE_PERIOD_MS = 10000;
 
+    private static final long TEMP_PERIOD_MS = 5000;
+    /** Temperature of the hottest thermal zone in °C, or -1 when the kernel does not expose it. */
+    private int tempC = -1;
+
+    private final Runnable tempTick = new Runnable() {
+        @Override
+        public void run() {
+            int t = readTemp();
+            if (t != tempC) {
+                tempC = t;
+                renderFan();
+            }
+            handler.postDelayed(this, TEMP_PERIOD_MS);
+        }
+    };
+
+    /** Highest /sys/class/thermal/thermal_zone*\/temp; values above 1000 are milli-degrees. */
+    private static int readTemp() {
+        int best = -1;
+        for (int i = 0; i < 12; i++) {
+            java.io.File f = new java.io.File("/sys/class/thermal/thermal_zone" + i + "/temp");
+            if (!f.canRead()) continue;
+            try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f))) {
+                String line = r.readLine();
+                if (line == null) continue;
+                long v = Long.parseLong(line.trim());
+                if (v > 1000) v /= 1000;
+                if (v > 0 && v < 150 && v > best) best = (int) v;
+            } catch (Exception ignored) {
+            }
+        }
+        return best;
+    }
+
     private final Runnable voltageTick = new Runnable() {
         @Override
         public void run() {
@@ -465,6 +499,8 @@ public class HomeActivity extends Activity {
         renderClock();
         handler.removeCallbacks(clockTick);
         handler.post(clockTick);
+        handler.removeCallbacks(tempTick);
+        handler.post(tempTick);
         if (session != null) session.refresh();
         if (volume != null) volume.refresh();
         if (mute != null) mute.refresh();
@@ -494,6 +530,7 @@ public class HomeActivity extends Activity {
         // Leaving the home screen with the backlight off (another app, a call): turn it back on.
         if (screenOffOverlay != null && screenOffOverlay.getVisibility() == View.VISIBLE) setScreenOn(true);
         handler.removeCallbacks(clockTick);
+        handler.removeCallbacks(tempTick);
         handler.removeCallbacks(voltageTick);
         handler.removeCallbacks(autoScreenOff);
         gps.stop();
@@ -875,7 +912,8 @@ public class HomeActivity extends Activity {
     private void renderFan() {
         if (fanText == null) return;
         fanDot.setActivated(fanOn);
-        fanText.setText(fanOn ? R.string.home_fan_on : R.string.home_fan_off);
+        String st = getString(fanOn ? R.string.home_fan_on : R.string.home_fan_off);
+        fanText.setText(tempC > 0 ? st + " \u00b7 " + tempC + "\u00b0C" : st);
         fanText.setTextColor(fanOn ? Ui.TEXT : Ui.TEXT_MUTED);
     }
 
