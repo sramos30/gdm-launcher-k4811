@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.SystemClock;
 
 import com.k4811.launcher.R;
 
@@ -48,6 +49,12 @@ public final class TrackerService extends Service implements LocationListener {
     private static final int BATCH = 500;
     private static final float BAD_ACCURACY = 50f;
     private static final long FLUSH_MS = 15000;
+    /**
+     * Relógio de parede abaixo disto não é confiável: algumas centrais (Lelong) perdem a hora ao desligar e voltam
+     * para 01/01/2022 até o NTP acertar. É uma data antes de qualquer build real; suba se um dia ficar velha demais.
+     * (2026-11-01 00:00 UTC)
+     */
+    private static final long MIN_TRUSTED_MS = 1793491200000L;
 
     /** Serviço de pé neste processo. */
     static volatile boolean running = false;
@@ -60,9 +67,12 @@ public final class TrackerService extends Service implements LocationListener {
     private File queueFile;
     private Location gpsFix, netFix;
     private Location lastSent;
-    private long lastSentAt = 0;
+    private long lastSentEl = -1;       // SystemClock.elapsedRealtime() do último ponto (-1 = nenhum ainda)
     private long lastFlush = 0;
-    private long startedAt = 0;
+    private long startedEl = 0;
+    /** Âncora de hora UTC vinda do GPS: utc = anchorUtc + (elapsedRealtime - anchorEl). Independe do relógio de parede. */
+    private long anchorUtc = 0, anchorEl = 0;
+    private boolean warnedNoTime = false;
     private boolean loggedFirstFix = false;
     private boolean started = false;
     private String lastNotification = "";
@@ -106,7 +116,7 @@ public final class TrackerService extends Service implements LocationListener {
             PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
             wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "tracker:svc");
             wl.acquire();
-            startedAt = System.currentTimeMillis();
+            startedEl = SystemClock.elapsedRealtime();
             TrackerLog.log(this, "serviço iniciado (dispositivo " + cfg.device() + ")");
             cfg.setStatus("started", DateFormat.getDateTimeInstance().format(new Date()));
             registerListeners();
@@ -147,8 +157,13 @@ public final class TrackerService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location l) {
-        if (LocationManager.GPS_PROVIDER.equals(l.getProvider())) gpsFix = l;
-        else netFix = l;
+        if (LocationManager.GPS_PROVIDER.equals(l.getProvider())) {
+            gpsFix = l;
+            if (l.getTime() >= MIN_TRUSTED_MS) {      // hora UTC dos satélites
+                anchorUtc = l.getTime();
+                anchorEl = elapsedOf(l);
+            }
+        } else netFix = l;
     }
 
     @Override
@@ -163,11 +178,35 @@ public final class TrackerService extends Service implements LocationListener {
     public void onProviderDisabled(String p) {
     }
 
+    /** Instante do fix em SystemClock.elapsedRealtime() (ms), que não muda quando o relógio de parede é acertado. */
+    private static long elapsedOf(Location l) {
+        long ns = l.getElapsedRealtimeNanos();
+        return ns > 0 ? ns / 1000000L : SystemClock.elapsedRealtime() - (System.currentTimeMillis() - l.getTime());
+    }
+
+    private static long ageMs(Location l) {
+        return SystemClock.elapsedRealtime() - elapsedOf(l);
+    }
+
+    /** Hora UTC confiável agora, ou 0 se não houver (relógio de parede ruim e nenhum fix GPS desde o boot). */
+    private long trustedNow() {
+        long wall = System.currentTimeMillis();
+        if (wall >= MIN_TRUSTED_MS) return wall;
+        if (anchorUtc > 0) return anchorUtc + (SystemClock.elapsedRealtime() - anchorEl);
+        return 0;
+    }
+
+    /** Hora do ponto: a do próprio fix GPS (satélites) ou a hora confiável; 0 = sem hora confiável. */
+    private long pointTime(Location fix) {
+        if (fix != null && LocationManager.GPS_PROVIDER.equals(fix.getProvider()) && fix.getTime() >= MIN_TRUSTED_MS)
+            return fix.getTime();
+        return trustedNow();
+    }
+
     private Location bestFix() {
         long maxAge = Math.max(30000, cfg.intervalSec() * 3000L);
-        long now = System.currentTimeMillis();
-        if (gpsFix != null && now - gpsFix.getTime() <= maxAge) return gpsFix;
-        if (netFix != null && now - netFix.getTime() <= maxAge) return netFix;
+        if (gpsFix != null && ageMs(gpsFix) <= maxAge) return gpsFix;
+        if (netFix != null && ageMs(netFix) <= maxAge) return netFix;
         return null;
     }
 
@@ -185,7 +224,7 @@ public final class TrackerService extends Service implements LocationListener {
     };
 
     private void evaluate() throws Exception {
-        long now = System.currentTimeMillis();
+        long now = SystemClock.elapsedRealtime();   // só para intervalos; a hora dos pontos vem de pointTime()
         Location fix = bestFix();
         boolean enqueue = false;
         if (fix != null && !loggedFirstFix) {
@@ -201,18 +240,24 @@ public final class TrackerService extends Service implements LocationListener {
             }
         }
         int hb = cfg.heartbeatMin();
-        boolean waitingFirstFix = fix == null && lastSent == null && now - startedAt < 45000;   // espera até 45 s pelo 1º fix
-        boolean heartbeat = !enqueue && !waitingFirstFix && hb > 0 && now - lastSentAt >= hb * 60000L;
+        boolean waitingFirstFix = fix == null && lastSent == null && now - startedEl < 45000;   // espera até 45 s pelo 1º fix
+        boolean heartbeat = !enqueue && !waitingFirstFix && hb > 0 && (lastSentEl < 0 || now - lastSentEl >= hb * 60000L);
 
         if (enqueue || heartbeat) {
-            append(toJson(fix, now).toString());
-            lastSentAt = now;
-            if (enqueue) lastSent = fix;
+            long ts = pointTime(fix);
+            if (ts > 0) {
+                append(toJson(fix, ts).toString());
+                lastSentEl = now;
+                if (enqueue) lastSent = fix;
+            } else if (!warnedNoTime) {
+                warnedNoTime = true;       // relógio de parede ruim e ainda sem fix GPS: um ponto com data errada é pior que nenhum
+                TrackerLog.log(this, "sem hora confiável (relógio do sistema antes de 2026 e sem fix GPS): ponto não enfileirado");
+            }
         }
         cfg.setStatus("fix", fix == null ? "-" :
             String.format("%s %.5f, %.5f ±%.0fm", fix.getProvider(), fix.getLatitude(), fix.getLongitude(),
                 fix.hasAccuracy() ? fix.getAccuracy() : -1));
-        if (now - lastFlush >= FLUSH_MS || lastFlush == 0) {
+        if (lastFlush == 0 || now - lastFlush >= FLUSH_MS) {
             lastFlush = now;
             flush();
         }
@@ -220,9 +265,9 @@ public final class TrackerService extends Service implements LocationListener {
         updateNotification();
     }
 
-    private JSONObject toJson(Location l, long now) throws Exception {
+    private JSONObject toJson(Location l, long ts) throws Exception {
         JSONObject o = new JSONObject();
-        o.put("ts", now);
+        o.put("ts", ts);
         if (l != null) {
             o.put("lat", l.getLatitude());
             o.put("lon", l.getLongitude());
